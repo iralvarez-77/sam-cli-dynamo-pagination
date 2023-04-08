@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+  # SaveHelloFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+      # CodeUri: app.js
+      # Runtime: nodejs18.x
+      # Handler: app.hello
+      # Policies:
+      #   - DynamoDBWritePolicy:
+      #       TableName: !Ref GreetingsTable
+      # Environment:
+      #   Variables:
+      #     GREETINGS_TABLE: !Ref GreetingsTable
+      # Events:
+      #   Api:
+      #     Type: Api
+      #     Properties: 
+      #       Path: /saludos
+      #       Method: POST
+
+  GetHelloFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.get
+      Runtime: nodejs18.x
+      CodeUri: index.js
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref GreetingsTable
+      Environment:
+        Variables:
+          GREETINGS_TABLE: !Ref GreetingsTable
+      Events:
+        HelloAPI:
+          Type: Api
+          Properties:
+            Path: /saludos
+            Method: Get
+
+  GreetingsTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        - AttributeName: "name"
+          KeyType: "RANGE"
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        - AttributeName: "name"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+
+# Outputs:
+#   MyApi:
+#     Description: "API Gateway endpoint URL"
+#     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/saludos/"
+
+      # https://6164rrwrv7.execute-api.us-east-1.amazonaws.com/Prod/saludos
